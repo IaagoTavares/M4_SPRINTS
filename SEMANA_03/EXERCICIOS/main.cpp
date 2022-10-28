@@ -1,4 +1,4 @@
-//Link Projeto: 
+//Link Projeto: https://wokwi.com/projects/346630306404500052
 
 #define LED 19
 #define LED 21
@@ -8,158 +8,156 @@
 
 
 int buzzer = 2;
-int notasIndice  = 0;
-int ledValor = 0;
-int notas [30];
-int botao1Estado = 1;
-int botao2Estado = 1;
-int tempo = 500;
+int botaoGrava = 32;
+int botaoToca = 33;
 
+int melody[] = {
+  264, 297, 330, 352, 396, 440, 495, 495, 440, 396, 352,
+  330, 297, 264, 297, 330
+};
 
+int memoria[30] = {};
 
-void setup(){   
-    pinMode(LED, OUTPUT);
-    pinMode(LED, OUTPUT);
-    pinMode(LED, OUTPUT);
-    pinMode(LED, OUTPUT);
-    pinMode(LDR, INPUT);
-    pinMode(buzzer, OUTPUT);
+int noteDurations[] = {
+  4, 8, 8, 4, 4, 4, 4, 4
+};
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(19, OUTPUT);
+  pinMode(21, OUTPUT);
+  pinMode(18, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode(LDR, INPUT);
+  pinMode(buzzer, OUTPUT);
+  pinMode(botaoGrava, INPUT_PULLUP);
+  pinMode(botaoToca, OUTPUT);
+
 }
 
-void loop(){
 
-    atualizaLed();
-    armazenaNota();
-    tocaMusica();
+
+
+void loop() {
+  
+
+  // pintaLed();
+
+  tocaMusica();
+  gravador();
+  reprodutor();
+
+}
+
+
+
+void reprodutor(){
+    if(digitalRead(botaoGrava) == LOW){
+      noTone(buzzer);
+      delay(500);
+      for (int thisNote = 0; thisNote < 30; thisNote++) {
+        tone(buzzer, memoria[thisNote]);
+      }
+    }
+
+}
+
+void gravador(){
+  if(digitalRead(botaoGrava) == LOW){
+    int x = analogRead(LDR);
+    memoria[-1] = melody[map(x,4063, 32, 0, 15)];
+
+    Serial.println("Nota gravada com sucesso!");
     delay(1000);
-
+  }
 }
 
 
-void atualizaLed(){
-    valorSensor = analogRead(LDR);
-    if (ledValor != map(valorSensor, 32, 4063, 15, 0)){
-        ledValue = map(valorSensor, 32, 4063, 15, 0);
-        displayLedValue(ledValor);
-        countTo(ledValor);
-    }
+void pintaLed(){
+  int x = analogRead(LDR);
+  int n = map(x,4063, 32, 0, 15);
+
+  digitalWrite(19, n & 0b0001);
+  digitalWrite(21, n & 0b0010);
+  digitalWrite(18, n & 0b0100);
+  digitalWrite(5, n & 0b1000);
+  Serial.println(n);
 }
 
 
-void contagem(int valor ) {
-    for(int i = 0; i <= valor; i++) {
-        showLed(i);
-        playSound(i);
-        delay(timeout);
-        noTone(buzzer);
-    }
+void tocaMusica(){
+  int x = analogRead(LDR);
+  int n = map(x,4063, 32, 0, 15);
+  int i = 0; 
+  int j = 0;
+
+  switch(n) {
+  case 0:
+    i = 0;
+    j = 0;
+    break;
+  case 1:
+    i = 1;
+    j = 1;
+    break;
+  case 2:
+    i = 2;
+    j = 2;
+    break;
+  case 3:
+    i = 3;
+    j = 3;
+    break;
+  case 4:
+    i = 4;
+    j = 4;
+    break;
+  case 5:
+    i = 5;
+    j = 5;
+    break;
+  case 6:
+    i = 6;
+    j = 6;
+    break;
+  case 7:
+    i = 7;
+    j = 7;
+    break;
+  case 8:
+    i = 8;
+    j = 8;
+    break;
+  case 9:
+    i = 9;
+    j = 9;
+    break;
+  case 10:
+    i = 10;
+    j = 10;
+    break;
+  case 11:
+    i = 11;
+    j = 11;
+    break;
+  case 12:
+    i = 12;
+    j = 12;
+    break;
+  case 13:
+    i = 13;
+    j = 13;
+    break;
+  case 14:
+    i = 14;
+    j = 14;
+    break;
+  case 15:
+    i = 15;
+    j = 15;
+    break;
+  }
+  tone(buzzer, melody[i]);
+  delay(50);
 }
 
-void acendeLed(int valor){
-    digitalWrite(19, valor & 0b0001);
-    digitalWrite(21, valor & 0b0010);
-    digitalWrite(18, valor & 0b0100);
-    digitalWrite(5, valor & 0b1000);
-}
-
-void tocaMusica (){
-    int verificabotao2Status = digitalRead(21);
-    if (verificabotao2Status != botao2Estado){
-        if(verificabotao2Status == 0){
-            botao2Estado = 0;
-            for (int i = 0; i < notasIndice; i++){
-                tocaSom(notas[i]);
-                delay(tempo);
-                noTone(buzzer);
-            }
-        } else  {
-            botao2Estado = 1;
-        }
-    } 
-}
-
-void armazenaNota(){
-    int verificabotao1Status = digitalRead(19);
-    if (verificabotao1Status != botao1Estado) {
-        if (verificabotao1Status == 0){
-            botao1Estado = 0;
-            notas[notasIndice] = ledValor;
-            notasIndice++;
-        } else{
-            botao1Estado = 1;
-        }
-    }
-}
-
-void tocaSom(int valor){
-    int nota = 0;
-    char *nomeNota = "";
-    switch(nota){
-        case 0:
-            nota = 37;
-            nomeNota = "d1";
-            break;
-        case 1:
-            nota = 41;
-            nomeNota = "e1";
-            break;
-        case 2:
-            nota = 44;
-            nomeNota = "f1";
-            break;
-        case 3:
-            nota = 49;
-            nomeNota = "g1";
-            break;
-        case 4:
-            nota = 55;
-            nomeNota = "a1";
-            break;
-        case 5:
-            nota = 49;
-            nomeNota = "g1";
-            break;
-        case 6:
-            nota = 55;
-            nomeNota = "a1";
-            break;
-        case 7:
-            nota = 62;
-            nomeNota = "b1";
-            break;
-        case 8:
-            nota = 33;
-            nomeNota = "c1";
-            break;
-        case 9:
-            nota = 55;
-            nomeNota = "a1";
-            break;
-        case 10:
-            nota = 49;
-            nomeNota = "g1";
-            break;
-        case 11:
-            nota = 44;
-            nomeNota = "f1";
-            break;
-        case 12:
-            nota = 41;
-            nomeNota = "e1";
-            break;
-        case 13:
-            nota = 37;
-            nomeNota = "d1";
-            break;
-        case 14:
-            nota = 33;
-            nomeNota = "c1";
-            break;
-        case 15:
-            nota = 31;
-            nomeNota = "b0";
-            break;
-    }
-    displayNote(nomeNota);
-    tone(buzzer, nota);
-}
